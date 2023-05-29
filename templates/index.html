@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous" ></script>
+    <title>Stock Stalker 🗠</title>
+</head>
+<body>
+    <h1 class="text-center">Welcome to Stock Stalker <span id="stock-icon">🗠</span></h1>
+    <h3 class="display-6 text-center p-3 text-primary-emphasis">
+        Choose from our services
+    </h3>
+    <nav class="navbar navbar-expand-lg bg-secondary-subtle">
+        <div class="container-fluid">
+          
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <button id="intradayBtn" class="nav-link active fs-4">Intraday Trading Prices</button>
+              </li>
+              <li class="nav-item">
+                <button id="winningPortfolios" class="nav-link active fs-4" >Winning Portfolios</button>
+              </li>
+              <li class="nav-item dropdown">
+                <button class="nav-link dropdown-toggle fs-4"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Fundamental Data
+                </button>
+                <ul class="dropdown-menu">
+                  <li><button id="companyOverview" class="dropdown-item">Company Overview</button></li>
+                  <li><button id="incomeStatement" class="dropdown-item" >Income Statement</button></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><button id="balanceSheet" class="dropdown-item" >Balance Sheet</button></li>
+                  <li><button id="cashFlow" class="dropdown-item">Cash Flow</button></li>
+
+                </ul>
+              </li>
+
+              <li class="nav-item">
+                <button id="currencyConverter" class="nav-link active fs-4">Currency Converter</button>
+              </li>
+              <li class="nav-item dropdown">
+                <buton class="nav-link dropdown-toggle fs-4"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Commodities
+                </buton>
+                <ul class="dropdown-menu">
+                  <li><button id="wti" class="dropdown-item">Crude Oil Prices: West Texas Intermediate (WTI)</button></li>
+                  <li><button id="brent" class="dropdown-item">Crude Oil Prices (Brent)</button></li>
+                  <li><button id="copper" class="dropdown-item" >Global Price of Copper</button></li>
+                </ul>
+                <li class="nav-item dropdown">
+                  <buton class="nav-link dropdown-toggle fs-4"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Economic Indicators
+                  </buton>
+                  <ul class="dropdown-menu">
+                    <li><button id="gdp" class="dropdown-item" >Real GDP</button></li>
+                    <li><button id="treasuryYield" class="dropdown-item" >Treasury yield</button></li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <button class="nav-link dropdown-toggle fs-4"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Technical Indicators
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><button id="sma" class="dropdown-item">SMA ( simple moving average)</button></li>
+                    <li><button id="ema" class="dropdown-item">EMA (exponential moving average)</button></li>
+                  </ul>
+                </li>
+            </ul>
+        
+          </div>
+        </div>
+    </nav>
+    <h1 id="serviceTitle">Service: <span id="service" class="badge bg-secondary"></span></h1>
+    <select id="selectCompany" class="form-select" onchange="setCompany(this)">
+      <option selected>Choose A Company</option>
+      <option value="1">IBM</option>
+      <option value="2">Apple</option>
+      <option value="3">Google</option>
+      <option value="4">Tesla</option>
+      <option value="5">Nvidia</option>
+      <option value="6">Nike</option>
+      <option value="7">Meta</option>
+      <option value="8">Amazon</option>
+      <option value="9">General Electric</option>
+      <option value="10">Exxon Mobil</option>
+    </select>
+    <select id="selectInterval" class="form-select" onchange="setInterv(this)">
+      <option selected>Choose An Interval</option>
+      <option value="1">1min</option>
+      <option value="2">5min</option>
+      <option value="3">15min</option>
+      <option value="4">30min</option>
+      <option value="5">60min</option>
+      <option value="6">daily</option>
+      <option value="7">weekly</option>
+      <option value="8">monthly</option>
+    </select>
+    <select id="selectIntervalIntraday" class="form-select" onchange="setInterv(this)">
+      <option selected>Choose An Interval</option>
+      <option value="1">1min</option>
+      <option value="2">5min</option>
+      <option value="3">15min</option>
+      <option value="4">30min</option>
+      <option value="5">60min</option>
+    </select>
+    <select id="selectTimePeriod" class="form-select" onchange="setTimePeriod(this)">
+      <option selected>Choose A Time Period</option>
+      <option value="1">60</option>
+      <option value="2">200</option>
+    </select>
+    <select id="selectSeriesType" class="form-select" onchange="setSeriesType(this)">
+      <option selected>Choose A Series Type</option>
+      <option value="1">Close</option>
+      <option value="2">Open</option>
+      <option value="3">High</option>
+      <option value="4">Low</option>
+    </select>
+    <select id="currFrom" class="form-select" onchange="setFromCurrency(this)">
+      <option selected>From</option>
+      <option value="1">United States Dollar</option>
+      <option value="2">Euro</option>
+      <option value="3">Canadian Dollar</option>
+      <option value="4">United Arab Emirates Dirham</option>
+      <option value="5">Egyptian Pound</option>
+      <option value="6">Bitcoin</option>
+      
+    </select>
+    <select id="currTo" class="form-select" onchange="setToCurrency(this)">
+      <option selected>To</option>
+      <option value="1">United States Dollar</option>
+      <option value="2">Euro</option>
+      <option value="3">Canadian Dollar</option>
+      <option value="4">United Arab Emirates Dirham</option>
+      <option value="5">Egyptian Pound</option>
+      <option value="6">Bitcoin</option>
+    </select>
+    
+    <br>
+    <br>
+
+    <button id="displayInfoBtn" type="button" class="btn btn-success">Display Information</button>
+
+    <br>
+    <br>
+
+    <div id="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="spinner-border text-secondary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="spinner-border text-danger" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="spinner-border text-warning" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="spinner-border text-info" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="spinner-border text-dark" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div id="info">
+      <img id="stockImg" src="{{ url_for('static', filename='stocks.jpg') }}" class="rounded mx-auto d-block" alt="My Image">
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+#stock-icon {
+    color: green;
+    font-size: 55px;
+}
+
+#serviceTitle {
+    display: none;
+}
+
+#stockImg{
+    width: 50%;
+    height: 50%;
+}
+
+#selectCompany {
+    display: none;
+}
+#selectInterval {
+    display: none;
+}
+#selectIntervalIntraday {
+    display: none;
+}
+#selectTimePeriod {
+    display: none;
+}
+#selectSeriesType {
+    display: none;
+}
+#currFrom{
+    display: none;
+}
+#currTo{
+    display: none;
+}
+
+#displayInfoBtn {
+    display: none;
+}
+
+#loading {
+    display: none;
+}
